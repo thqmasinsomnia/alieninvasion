@@ -18,7 +18,6 @@ def create_alien(ai_settings, screen, aliens, alien_number, row_number):
 
 def create_fleet(ai_settings, screen, ship, aliens):
     alien = Alien(ai_settings, screen)
-    alien_width = alien.rect.width
     number_aliens_x = get_number_aliens_x(ai_settings, alien.rect.width)
     number_rows = get_number_rows(ai_settings, ship.rect.height, alien.rect.height)
 
@@ -46,6 +45,8 @@ def update_bullets(ai_settings, screen, stats, sb, ship, aliens, bullets):
 def check_bullet_alien_collisions(ai_settings, screen, stats, sb, ship, aliens, bullets):
     collisions = pygame.sprite.groupcollide(bullets, aliens, True, True)
     if collisions:
+        pygame.mixer.music.load("sounds/aliendeath.ogg")
+        pygame.mixer.music.play(0)
         for aliens in collisions.values():
             stats.score += ai_settings.alien_points * len(aliens)
             sb.prep_score()
@@ -76,6 +77,8 @@ def check_keydown_events(event, ai_settings, screen, ship, bullets):
 def fire_bullet(ai_settings, screen, ship, bullets):
     """Fire a bullet if limit not reached yet."""
     if len(bullets) < ai_settings.bullets_allowed:
+        pygame.mixer.music.load("sounds/fire.ogg")
+        pygame.mixer.music.play(0)
         new_bullet = Bullet(ai_settings, screen, ship)
         bullets.add(new_bullet)
 
@@ -85,6 +88,7 @@ def check_keyup_events(event, ship):
         ship.moving_right = False
     elif event.key == pygame.K_LEFT:
         ship.moving_left = False
+
 
 def check_events(ai_settings, screen, stats, sb, play_button, ship, aliens, bullets):
     for event in pygame.event.get():
@@ -97,6 +101,7 @@ def check_events(ai_settings, screen, stats, sb, play_button, ship, aliens, bull
         elif event.type == pygame.MOUSEBUTTONDOWN:
             mouse_x, mouse_y = pygame.mouse.get_pos()
             check_play_button(ai_settings, screen, stats, sb, play_button, ship, aliens, bullets, mouse_x, mouse_y)
+
 
 def check_play_button(ai_settings, screen, stats, sb, play_button, ship, aliens, bullets, mouse_x, mouse_y):
     if play_button.rect.collidepoint(mouse_x, mouse_y):
@@ -143,9 +148,11 @@ def change_fleet_direction(ai_settings, aliens):
 
 def ship_hit(ai_settings, screen, stats, sb, ship, aliens, bullets):
     if stats.ships_left > 0:
+        pygame.mixer.music.load("sounds/shipdeath.ogg")
+        pygame.mixer.music.play(0)
         stats.ships_left -= 1
 
-        #update scoreboard
+        # update scoreboard
         sb.prep_ships()
 
         # Empty the list of aliens and bullets.
@@ -162,6 +169,7 @@ def ship_hit(ai_settings, screen, stats, sb, ship, aliens, bullets):
         stats.game_active = False
         pygame.mouse.set_visible(True)
 
+
 def check_aliens_bottom(ai_settings, screen, stats, sb, ship, aliens, bullets):
     screen_rect = screen.get_rect()
     for alien in aliens.sprites():
@@ -169,6 +177,7 @@ def check_aliens_bottom(ai_settings, screen, stats, sb, ship, aliens, bullets):
             # Treat this the same as if the ship got hit.
             ship_hit(ai_settings, screen, stats, sb, ship, aliens, bullets)
             break
+
 
 def update_aliens(ai_settings, screen, stats, sb, ship, aliens, bullets):
     check_fleet_edges(ai_settings, aliens)
@@ -179,6 +188,7 @@ def update_aliens(ai_settings, screen, stats, sb, ship, aliens, bullets):
 
     # Look for aliens hitting the bottom of the screen.
     check_aliens_bottom(ai_settings, screen, stats, sb, ship, aliens, bullets)
+
 
 def check_high_score(stats, sb):
     if stats.score > stats.high_score:
@@ -197,7 +207,5 @@ def update_screen(ai_settings, screen, stats, sb, ship, aliens, bullets, play_bu
     # Draw the play button if the game is inactive.
     if not stats.game_active:
         play_button.draw_button()
-
-
 
     pygame.display.flip()

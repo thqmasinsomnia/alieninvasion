@@ -1,10 +1,9 @@
-import sys
 import pygame
 from pygame.sprite import Group
 
 from settings import Settings
 from ship import Ship
-from alien import Alien
+
 import game_functions as gf
 from game_stats import GameStats
 from button import Button
@@ -30,7 +29,6 @@ def run_game():
     gf.create_fleet(ai_settings, screen, ship, aliens)
 
     # Make an alien.
-    alien = Alien(ai_settings, screen)
 
     # Make the Play button.
     play_button = Button(ai_settings, screen, "Play")
